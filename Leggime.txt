@@ -1,0 +1,64 @@
+
+###########   Application.java   #############
+
+@SpringBootApplication  =>boostrap spring boot class
+
+ This is a convenience annotation that is equivalent to declaring {@code @Configuration},
+  {@code @EnableAutoConfiguration} and {@code @ComponentScan}.
+Tell the Spring container that this class is the source of bean definitions for use in Spring. 
+SpringApplication.run() call starts the Spring container and returns a Spring ApplicationContext object
+ 
+
+
+###########  LicenseServiceController.java  ###########
+
+Annotata @RestController che a sua volta annotata @Controller.Automaticamente  implementa JON seria/deserializzazione.
+@RequestMapping(value="v1/organizations/{organizationId}/licenses") mappa tutte le requests verso
+http://127.0.0.1:8080/v1/organizations/{organizationId}/licenses verso metodi LicenseServiceController
+
+Poi quale metodo va invocato dipende dalle annotazioni :
+
+ @RequestMapping(value="/{licenseId}",method = RequestMethod.GET)
+ @RequestMapping(value="{licenseId}",method = RequestMethod.PUT)
+ @RequestMapping(value="{licenseId}",method = RequestMethod.POST)
+ @RequestMapping(value="{licenseId}",method = RequestMethod.DELETE)
+ 
+Usa Postman in chrome per testing.
+
+Il matching e' fatto in AbstractHandlerMethodMapping.getHandlerInternal()
+
+La serializzazione (requestPost body json =>java object) avviene in:AbstractMessageConverterMethodArgumentResolver.readWithMessageConverters()
+
+La deserializzazione (response Java object=>Json) avviene in        AbstractMessageConverterMethodProcessor.writeWithMessageConverters()
+
+
+##########  spring-boot-starter-actuator   #################
+
+Fornisce i seguenti endpoints x monitoring:
+
+http://127.0.0.1:8080/env
+http://127.0.0.1:8080/metrics
+http://127.0.0.1:8080/info
+http://127.0.0.1:8080/mappings
+http://127.0.0.1:8080/beans
+http://127.0.0.1:8080/trace
+http://127.0.0.1:8080/autoconfig
+http://127.0.0.1:8080/configprops
+http://127.0.0.1:8080/dump
+http://127.0.0.1:8080/health
+
+
+Se si rimuove spring-boot-starter-actuator dal pom, il service funziona ancora ma gli endpoint 
+qui sopra scompaiono.
+
+
+
+
+
+
+
+
+
+
+
+
