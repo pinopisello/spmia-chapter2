@@ -10,14 +10,12 @@
 	<name>Eagle Eye Licensing Service</name>
 	<description>Licensing Service</description>
 
-	<!-- Importo il parent in modo che le dependencies abbiano stessa version 
-		del parent! -->
+	<!-- Importo il parent in modo che le dependencies abbiano stessa version del parent! -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
            <version>1.4.4.RELEASE</version>
 		<relativePath />
-           <!-- lookup parent from repository -->
 	</parent>
 	
 	<dependencies>
@@ -25,13 +23,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<exclusions>
+			    <!-- escludi se vuoi usare spring-boot-starter-jetty invede di tomcat -->
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-tomcat</artifactId>
 				</exclusion>
+				 
 			</exclusions>
 		</dependency>
-
+        <!-- includi se vuoi usare spring-boot-starter-jetty invede di tomcat -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jetty</artifactId>
@@ -43,23 +43,42 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<start-class>com.thoughtmechanix.licenses.Application</start-class>
-		<docker.image.name>johncarnell/tmx-licensing-service</docker.image.name>
+		<!-- <start-class>com.thoughtmechanix.licenses.Application</start-class> -->
+		<docker.image.name>pinopisello/tmx-licensing-service</docker.image.name>
 		<docker.image.tag>chapter2</docker.image.tag>
+		<dockerHost>https://192.168.99.100:2376</dockerHost>
+		<dockerTlsVerify>1</dockerTlsVerify>
+		<dockerCertPath>/Users/glocon/.docker/machine/machines/default</dockerCertPath>
 	</properties>
 
 	<build>
 		<plugins>
-			<!-- We use the Resources plugin to filer Dockerfile and run.sh, it inserts 
-				actual JAR filename -->
-			<!-- The final Dockerfile will be created in target/dockerfile/Dockerfile -->
+			<!-- spring-boot-maven-plugin esegue quando invoco mvn spring-boot:run 
+				anche responsabile repackaging dell app con aggiunta BOOT-INF/classes,BOOT-INF/lib 
+				,org/springframework/boot/loader per esecuzione standalone http://docs.spring.io/spring-boot/docs/current/maven-plugin/usage.html 
+				
+				Contiene RepackageMojo che aggiunge BOOT-INF,org/springframework/boot/loader,etc 
+			    nel jar finale
+			-->			
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+				<!-- Per debuggare da eclipse
+					<jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</jvmArguments>
+                -->
+				</configuration>
+			</plugin>
+			
+			<!-- copia src/main/docker/Dockerfile e src/main/docker/run.sh in /target/dockerfile 
+			     sostituendo @project.build.finalName@ in simple-service-0.0.1-SNAPSHOT.jar in /target/dockerfile/Dockerfile 
+			-->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
@@ -83,8 +102,10 @@
 				</executions>
 			</plugin>
 
-			<!-- https://github.com/spotify/docker-maven-plugin Permette di creare 
-				un docker image -->
+			<!-- Genera doker image : mvn docker:build https://github.com/spotify/docker-maven-plugin 
+				 Input: target/dockerfile/Dockerfile
+				  Output:pinopisello/tmx-simple-service 
+				 in usando Non agganciata alcuna fase.Occorre eseguire: mvn docker:build -->
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
@@ -102,19 +123,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- http://docs.spring.io/spring-boot/docs/1.5.1.RELEASE/maven-plugin/ 
-				permette usare spring-boot:run ,spring-boot:repackage ,spring-boot:start,spring-boot:stop -->
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<jvmArguments>
-						-Xdebug
-						-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
-					</jvmArguments>
 
-				</configuration>
-			</plugin>
 
 		</plugins>
 	</build>

@@ -19,9 +19,7 @@ public class LicenseServiceController {
     private LicenseService licenseService;
 
     @RequestMapping(value="/{licenseId}",method = RequestMethod.GET)
-    public License getLicenses( @PathVariable("organizationId") String organizationId,
-                                @PathVariable("licenseId") String licenseId) {
-
+    public License getLicenses( @PathVariable("organizationId") String organizationId, @PathVariable("licenseId") String licenseId) {
         //return licenseService.getLicense(licenseId);
         return new License()
             .withId(licenseId)

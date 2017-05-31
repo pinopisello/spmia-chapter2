@@ -1,3 +1,8 @@
+Implementazione di un microservice com.thoughtmechanix.simpleservice.Application 
+dove al contrario spmia-chapter1, Application e' SOLO bootstrapper [@SpringBootApplication]
+Controller e request mapper e' LicenseServiceController.java [@RestController,@RequestMapping]
+
+
 
 ###########   Application.java   #############
 
@@ -51,7 +56,31 @@ http://127.0.0.1:8080/health
 Se si rimuove spring-boot-starter-actuator dal pom, il service funziona ancora ma gli endpoint 
 qui sopra scompaiono.
 
+##########################       POM      ############################################
 
+Rispetto a spmia-chapter1, spring-boot-starter-web esclude spring-boot-starter-tomcat ed include spring-boot-starter-jetty
+per runnare microservice in jetty.
+
+In piu si e' aggiunto  spring-boot-starter-actuator che espone endpoint come /env,/mappings,etc per troubleshooting
+
+
+Quindi : mvn package => genera licensing-service-0.0.1-SNAPSHOT.jar
+
+mvn spring-boot:run => lancia licensing-service  [ovviamente si puo lanciare anche con java -jar licensing-service-0.0.1-SNAPSHOT.jar]
+
+mvn docker:build   => crea docker image pinopisello/tmx-licensing-service
+
+lancia container col MS running   => docker run -p 8080:8080 --name spmia-chapter2_container pinopisello/tmx-licensing-service:chapter2  
+
+Testare MS (GET.PUT,POST,DELETE):
+
+http://127.0.0.1:8080/v1/organizations/{organizationId}/licenses/{licenseId}
+
+Testare MS docker container:                       
+http://192.168.99.100:8080/v1/organizations/{organizationId}/licenses/{licenseId}
+                                   
+            
+                              
 
 
 
